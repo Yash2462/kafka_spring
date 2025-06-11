@@ -11,6 +11,9 @@ public class MessageConsumer {
     @KafkaListener(topics = "my-topic", groupId = "my-group-a")
     public void listen(String message) {
         System.out.println("Received message: " + message);
+        if ("fail".equalsIgnoreCase(message)) {
+            throw new RuntimeException("Simulated processing error");
+        }
     }
 
     @KafkaListener(topics = "my-topic", groupId = "my-group-b")
