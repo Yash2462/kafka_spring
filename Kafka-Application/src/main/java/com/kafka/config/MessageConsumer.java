@@ -3,6 +3,8 @@ package com.kafka.config;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class MessageConsumer {
 
@@ -19,5 +21,14 @@ public class MessageConsumer {
     @KafkaListener(topics = "my-topic", groupId = "my-group-b")
     public void listen1(String message) {
         System.out.println("Received message to other subscriber: " + message);
+    }
+
+    @KafkaListener(topics = "my-topic", groupId = "my-group-batch")
+    public void listen(List<String> messages) {
+        System.out.println("Received batch of messages: " + messages);
+        for (String message : messages) {
+            // Process each message
+            System.out.println("Processing: " + message);
+        }
     }
 }

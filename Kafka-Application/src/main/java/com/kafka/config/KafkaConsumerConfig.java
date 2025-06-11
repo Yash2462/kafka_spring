@@ -33,6 +33,9 @@ public class KafkaConsumerConfig {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
 
+        //enable batch processing
+        factory.setBatchListener(true);
+
         // Configure retry: 3 attempts, 2 seconds between attempts
         factory.setCommonErrorHandler(
                 new DefaultErrorHandler(
