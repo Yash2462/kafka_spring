@@ -82,17 +82,42 @@ spring.kafka.consumer.group-id=my-group-id
 ```
 
 ## How to Run
+1. **Start Kafka & Zookeeper with Docker Compose**  
+   If you have Docker installed, you can use the following `docker-compose.yml` to start Kafka and Zookeeper without manual installation:
 
-1. **Start Kafka & Zookeeper**  
+   ```yaml
+   version: '3'
+   services:
+     zookeeper:
+       image: confluentinc/cp-zookeeper:7.5.0
+       environment:
+         ZOOKEEPER_CLIENT_PORT: 2181
+         ZOOKEEPER_TICK_TIME: 2000
+       ports:
+         - "2181:2181"
+
+     kafka:
+       image: confluentinc/cp-kafka:7.5.0
+       depends_on:
+         - zookeeper
+       ports:
+         - "9092:9092"
+       environment:
+         KAFKA_BROKER_ID: 1
+         KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+         KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+         KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+   
+2. **Start Kafka & Zookeeper**  
    Ensure you have a Kafka broker running locally on port 9092.
 
-2. **Build the Application**
+3. **Build the Application**
    ```sh
    cd Kafka-Application
    mvn clean install
    ```
 
-3. **Run the Spring Boot App**
+4. **Run the Spring Boot App**
    ```sh
    mvn spring-boot:run
    ```
@@ -106,6 +131,25 @@ spring.kafka.consumer.group-id=my-group-id
     ```sh
     curl -X POST "http://localhost:8080/send?message=HelloKafka"
     ```
+- **Send Batch Messages**
+  - **Endpoint:** `POST /sendBatch`
+  - **Body:** JSON array of strings
+  - **Example:**
+    ```sh
+    curl -X POST -H "Content-Type: application/json" \
+      -d '["msg1", "msg2", "msg3"]' \
+      http://localhost:8080/sendBatch
+    ```
+
+- **Send Message to Specific Partition**
+  - **Endpoint:** `POST /sendToPartition`
+  - **Parameters:**
+    - `message` (String, as query param)
+    - `partition` (Integer, as query param)
+  - **Example:**
+    ```sh
+    curl -X POST "http://localhost:8080/sendToPartition?message=HelloPartition&partition=1"
+    ```    
 
 - **Consumer**
   - Listens to topic `my-topic` with group IDs: `my-group-a`, `my-group-b`
